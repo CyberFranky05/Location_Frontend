@@ -2,7 +2,7 @@
 export const config = {
 	// Use Vercel API proxy (same origin = HTTPS) when on Vercel, direct HTTP for local dev
 	apiUrl: typeof window !== 'undefined' && window.location.hostname === 'location-frontend-murex.vercel.app'
-		? '/api/v1'  // Vercel proxy endpoint (will be HTTPS automatically)
+		? '/api'  // Vercel proxy endpoint (will be HTTPS automatically)
 		: import.meta.env.PUBLIC_API_URL || 'http://localhost:3001/api/v1',
 	
 	// Keycloak still needs direct access (for redirects)
@@ -28,3 +28,4 @@ if (typeof window !== 'undefined') {
 		PROD: import.meta.env.PROD
 	});
 }
+
