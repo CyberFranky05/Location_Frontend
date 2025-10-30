@@ -1,0 +1,66 @@
+node_modules# Dependencies
+
+npm-debug.lognode_modules
+
+.DS_Storenpm-debug.log
+
+.envyarn-error.log
+
+.env.local
+
+.env.*.local# Build outputs (keep build - we copy it)
+
+.git.svelte-kit
+
+.gitignore# build
+
+.svelte-kitdist
+
+build.output
+
+.vscode.vercel
+
+*.log
+
+coverage# Environment files
+
+dist.env
+
+.cache.env.local
+
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+!README.md
+
+# Tests
+test
+coverage
+*.test.ts
+*.spec.ts
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+.prettierrc
+.eslintrc*
+tsconfig.json
+
