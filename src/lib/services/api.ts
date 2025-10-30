@@ -1,132 +1,262 @@
-import axios from 'axios';import axios from 'axios';
+import axios from 'axios';import axios from 'axios';import axios from 'axios';
 
-import { authStore } from '$lib/stores/auth';import { authStore } from '$lib/stores/auth';
+import { authStore } from '$lib/stores/auth';
+
+import { config } from '$lib/config';import { authStore } from '$lib/stores/auth';import { authStore } from '$lib/stores/auth';
+
+import { get } from 'svelte/store';
 
 import { get } from 'svelte/store';import { get } from 'svelte/store';
 
+// Use runtime config
+
+const API_URL = config.apiUrl;
 
 
-// Debug: Log all environment variables// Use production URL - ENV vars don't work reliably in Docker builds
+
+console.log('[API Service] Using API_URL:', API_URL);// Debug: Log all environment variables// Use production URL - ENV vars don't work reliably in Docker builds
+
+console.log('[API Service] Full config:', config);
 
 console.log('[API Config] Environment check:', {const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
-	PUBLIC_API_URL: import.meta.env.PUBLIC_API_URL,
+// Create axios instance
 
-	PUBLIC_KEYCLOAK_URL: import.meta.env.PUBLIC_KEYCLOAK_URL,// Create axios instance
+const api = axios.create({	PUBLIC_API_URL: import.meta.env.PUBLIC_API_URL,
 
-	MODE: import.meta.env.MODE,const api = axios.create({
+	baseURL: API_URL,
+
+	headers: {	PUBLIC_KEYCLOAK_URL: import.meta.env.PUBLIC_KEYCLOAK_URL,// Create axios instance
+
+		'Content-Type': 'application/json'
+
+	}	MODE: import.meta.env.MODE,const api = axios.create({
+
+});
 
 	PROD: import.meta.env.PROD,	baseURL: API_URL,
 
-	DEV: import.meta.env.DEV	headers: {
-
-});		'Content-Type': 'application/json'
-
-	}
-
-// Get API URL from environment or use fallback});
-
-const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3001/api/v1';
-
 // Add auth token to requests
 
-console.log('[API Config] Using API_URL:', API_URL);api.interceptors.request.use((config) => {
+api.interceptors.request.use((config) => {	DEV: import.meta.env.DEV	headers: {
 
 	const auth = get(authStore);
 
-// Create axios instance	if (auth.accessToken) {
+	if (auth.accessToken) {});		'Content-Type': 'application/json'
 
-const api = axios.create({		config.headers.Authorization = `Bearer ${auth.accessToken}`;
+		config.headers.Authorization = `Bearer ${auth.accessToken}`;
 
-	baseURL: API_URL,	}
-
-	headers: {	return config;
-
-		'Content-Type': 'application/json'});
-
-	}
-
-});// Handle token refresh on 401
-
-api.interceptors.response.use(
-
-// Add auth token to requests	(response) => response,
-
-api.interceptors.request.use((config) => {	async (error) => {
-
-	const auth = get(authStore);		const originalRequest = error.config;
-
-	if (auth.accessToken) {
-
-		config.headers.Authorization = `Bearer ${auth.accessToken}`;		if (error.response?.status === 401 && !originalRequest._retry) {
-
-	}			originalRequest._retry = true;
+	}	}
 
 	return config;
 
-});			const auth = get(authStore);
+});// Get API URL from environment or use fallback});
 
-			if (auth.refreshToken) {
 
-// Handle token refresh on 401				try {
 
-api.interceptors.response.use(					const response = await axios.post(`${API_URL}/auth/refresh`, {
+// Handle token refresh on 401const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
-	(response) => response,						refresh_token: auth.refreshToken
+api.interceptors.response.use(
 
-	async (error) => {					});
+	(response) => response,// Add auth token to requests
 
-		const originalRequest = error.config;
+	async (error) => {
 
-					const { access_token, refresh_token } = response.data;
+		const originalRequest = error.config;console.log('[API Config] Using API_URL:', API_URL);api.interceptors.request.use((config) => {
 
-		if (error.response?.status === 401 && !originalRequest._retry) {					authStore.updateTokens(access_token, refresh_token);
+
+
+		if (error.response?.status === 401 && !originalRequest._retry) {	const auth = get(authStore);
 
 			originalRequest._retry = true;
 
-					originalRequest.headers.Authorization = `Bearer ${access_token}`;
+// Create axios instance	if (auth.accessToken) {
 
-			const auth = get(authStore);					return api(originalRequest);
+			const auth = get(authStore);
 
-			if (auth.refreshToken) {				} catch (refreshError) {
+			if (auth.refreshToken) {const api = axios.create({		config.headers.Authorization = `Bearer ${auth.accessToken}`;
 
-				try {					authStore.logout();
+				try {
 
-					const response = await axios.post(`${API_URL}/auth/refresh`, {					window.location.href = '/signin';
+					const response = await axios.post(`${API_URL}/auth/refresh`, {	baseURL: API_URL,	}
 
-						refresh_token: auth.refreshToken					return Promise.reject(refreshError);
+						refresh_token: auth.refreshToken
 
-					});				}
+					});	headers: {	return config;
 
-			}
 
-					const { access_token, refresh_token } = response.data;		}
+
+					const { access_token, refresh_token } = response.data;		'Content-Type': 'application/json'});
 
 					authStore.updateTokens(access_token, refresh_token);
 
-		return Promise.reject(error);
+	}
 
-					originalRequest.headers.Authorization = `Bearer ${access_token}`;	}
+					originalRequest.headers.Authorization = `Bearer ${access_token}`;
 
-					return api(originalRequest););
+					return api(originalRequest);});// Handle token refresh on 401
 
 				} catch (refreshError) {
 
-					authStore.logout();export interface SignUpData {
+					authStore.logout();api.interceptors.response.use(
 
-					window.location.href = '/signin';	name: string;
+					window.location.href = '/signin';
 
-					return Promise.reject(refreshError);	email: string;
+					return Promise.reject(refreshError);// Add auth token to requests	(response) => response,
 
-				}	password: string;
+				}
 
-			}}
+			}api.interceptors.request.use((config) => {	async (error) => {
 
 		}
 
+	const auth = get(authStore);		const originalRequest = error.config;
+
+		return Promise.reject(error);
+
+	}	if (auth.accessToken) {
+
+);
+
+		config.headers.Authorization = `Bearer ${auth.accessToken}`;		if (error.response?.status === 401 && !originalRequest._retry) {
+
+export interface SignUpData {
+
+	name: string;	}			originalRequest._retry = true;
+
+	email: string;
+
+	password: string;	return config;
+
+}
+
+});			const auth = get(authStore);
+
 export interface SignInData {
 
+	email: string;			if (auth.refreshToken) {
+
+	password: string;
+
+}// Handle token refresh on 401				try {
+
+
+
+export interface SignInAttempt {api.interceptors.response.use(					const response = await axios.post(`${API_URL}/auth/refresh`, {
+
+	id: string;
+
+	user_id: string;	(response) => response,						refresh_token: auth.refreshToken
+
+	email: string;
+
+	ip_address: string;	async (error) => {					});
+
+	country?: string;
+
+	city?: string;		const originalRequest = error.config;
+
+	region?: string;
+
+	latitude?: number;					const { access_token, refresh_token } = response.data;
+
+	longitude?: number;
+
+	timezone?: string;		if (error.response?.status === 401 && !originalRequest._retry) {					authStore.updateTokens(access_token, refresh_token);
+
+	isp?: string;
+
+	user_agent?: string;			originalRequest._retry = true;
+
+	browser?: string;
+
+	device?: string;					originalRequest.headers.Authorization = `Bearer ${access_token}`;
+
+	os?: string;
+
+	success: boolean;			const auth = get(authStore);					return api(originalRequest);
+
+	failure_reason?: string;
+
+	timestamp: string;			if (auth.refreshToken) {				} catch (refreshError) {
+
+}
+
+				try {					authStore.logout();
+
+export const authAPI = {
+
+	async signUp(data: SignUpData) {					const response = await axios.post(`${API_URL}/auth/refresh`, {					window.location.href = '/signin';
+
+		const response = await api.post('/auth/signup', data);
+
+		return response.data;						refresh_token: auth.refreshToken					return Promise.reject(refreshError);
+
+	},
+
+					});				}
+
+	async signIn(data: SignInData) {
+
+		const response = await api.post('/auth/signin', data);			}
+
+		const { access_token, refresh_token, user } = response.data;
+
+		authStore.login(access_token, refresh_token, user);					const { access_token, refresh_token } = response.data;		}
+
+		return response.data;
+
+	},					authStore.updateTokens(access_token, refresh_token);
+
+
+
+	async logout() {		return Promise.reject(error);
+
+		const auth = get(authStore);
+
+		if (auth.refreshToken) {					originalRequest.headers.Authorization = `Bearer ${access_token}`;	}
+
+			try {
+
+				await api.post('/auth/logout', { refresh_token: auth.refreshToken });					return api(originalRequest););
+
+			} catch (e) {
+
+				// Ignore logout errors				} catch (refreshError) {
+
+			}
+
+		}					authStore.logout();export interface SignUpData {
+
+		authStore.logout();
+
+	},					window.location.href = '/signin';	name: string;
+
+
+
+	async getProfile() {					return Promise.reject(refreshError);	email: string;
+
+		const response = await api.get('/auth/profile');
+
+		return response.data;				}	password: string;
+
+	},
+
+			}}
+
+	async getSignInAttempts(limit = 50, offset = 0): Promise<{ attempts: SignInAttempt[]; total: number }> {
+
+		const response = await api.get(`/auth/signin-attempts?limit=${limit}&offset=${offset}`);		}
+
+		return response.data;
+
+	}export interface SignInData {
+
+};
+
 		return Promise.reject(error);	email: string;
+
+export default api;
 
 	}	password: string;
 
